@@ -12,11 +12,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ../database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taxi_user -d taxi_driver"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
 
   # API FastAPI
@@ -28,16 +23,14 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Volumes pour le développement (évite de reconstruire)
-      - ../../app:/app/app
-      - ../../scripts:/app/scripts
-      - ../../requirements.txt:/app/requirements.txt
-      - ../../requirements-dev.txt:/app/requirements-dev.txt
-      # Volumes pour les données
-      - ../../data/results:/app/data/results
-      - ../../data/models:/app/data/models
-      # Volume pour les logs
-      - ../../data/logs:/app/data/logs
+      # Volumes optimisés pour le développement
+      - ../../app:/app/app:delegated
+      - ../../scripts:/app/scripts:delegated
+      - ../../config:/app/config:delegated
+      # Volume pour les logs uniquement
+      - ../../data/logs:/app/data/logs:delegated
+      # Volume pour les résultats et images
+      - ../../data/results:/app/data/results:delegated
     environment:
       - PYTHONUNBUFFERED=1
       - DATABASE_URL=postgresql://taxi_user:taxi_password@postgres:5432/taxi_driver
@@ -50,37 +43,14 @@ services:
       - DEBUG=true
       - RELOAD=true
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 3
-      start_period: 30s
-
-  taxi-driver-frontend:
-    build:
-      context: ../../frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - VITE_API_URL=http://localhost:8000
-    volumes:
-      - ../../frontend:/app
-      - /app/node_modules
-    depends_on:
-      - taxi-driver-api
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
-    # Commande de développement (serveur de développement)
-    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+      start_period: 10s
 
 volumes:
   postgres_data:

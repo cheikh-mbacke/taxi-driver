@@ -8,30 +8,31 @@ from app.api.routes.database_routes import database_router
 from app.api.schemas.sarsa import SarsaParams
 from app.api.services.sarsa import run_sarsa
 
+# Initialize FastAPI application
 app = FastAPI(
     title="Taxi Driver RL API",
-    description="API d'apprentissage par renforcement pour l'environnement Taxi-v3 avec PostgreSQL",
+    description="Reinforcement Learning API for Taxi-v3 environment with PostgreSQL",
     version="2.0.0"
 )
 
-# Configuration CORS
+# CORS configuration for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # In production, specify exact origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Monter les fichiers statiques
+# Mount static files for serving generated plots
 app.mount("/assets", StaticFiles(directory="data/results"), name="assets")
 
-# Inclure les routes de base de données
+# Include database routes
 app.include_router(database_router, prefix="/database", tags=["database"])
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    """Page d'accueil de l'API"""
+    """API home page with documentation links"""
     return """
     <html>
         <head>
@@ -46,34 +47,34 @@ async def root():
         <body>
             <div class="container">
                 <h1>🚕 Taxi Driver RL API</h1>
-                <p>API d'apprentissage par renforcement pour l'environnement Taxi-v3</p>
+                <p>Reinforcement Learning API for Taxi-v3 environment</p>
                 
                 <h2>📚 Documentation</h2>
                 <div class="endpoint">
-                    <span class="method">GET</span> <a href="/docs">/docs</a> - Documentation interactive (Swagger)
+                    <span class="method">GET</span> <a href="/docs">/docs</a> - Interactive documentation (Swagger)
                 </div>
                 <div class="endpoint">
-                    <span class="method">GET</span> <a href="/redoc">/redoc</a> - Documentation alternative (ReDoc)
+                    <span class="method">GET</span> <a href="/redoc">/redoc</a> - Alternative documentation (ReDoc)
                 </div>
                 
-                <h2>🔌 Endpoints Principaux</h2>
+                <h2>🔌 Main Endpoints</h2>
                 <div class="endpoint">
-                    <span class="method">GET</span> <a href="/health">/health</a> - Statut de l'API
+                    <span class="method">GET</span> <a href="/health">/health</a> - API status
                 </div>
                 <div class="endpoint">
-                    <span class="method">POST</span> /sarsa - Entraînement SARSA
-                </div>
-                
-                <h2>🗄️ Base de Données</h2>
-                <div class="endpoint">
-                    <span class="method">GET</span> <a href="/database/runs">/database/runs</a> - Liste des entraînements
-                </div>
-                <div class="endpoint">
-                    <span class="method">GET</span> <a href="/database/statistics">/database/statistics</a> - Statistiques
+                    <span class="method">POST</span> /sarsa - SARSA training
                 </div>
                 
-                <h2>🚀 Démarrage Rapide</h2>
-                <p>Pour tester l'API, utilisez l'endpoint SARSA :</p>
+                <h2>🗄️ Database</h2>
+                <div class="endpoint">
+                    <span class="method">GET</span> <a href="/database/runs">/database/runs</a> - Training runs list
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span> <a href="/database/statistics">/database/statistics</a> - Statistics
+                </div>
+                
+                <h2>🚀 Quick Start</h2>
+                <p>To test the API, use the SARSA endpoint:</p>
                 <pre>
 curl -X POST "http://localhost:8000/sarsa" \\
      -H "Content-Type: application/json" \\
@@ -86,7 +87,7 @@ curl -X POST "http://localhost:8000/sarsa" \\
 
 @app.get("/health")
 async def health_check():
-    """Vérification de l'état de l'API"""
+    """API health check endpoint"""
     return {
         "status": "healthy",
         "service": "taxi-driver-api",
@@ -96,18 +97,18 @@ async def health_check():
 
 @app.post("/sarsa")
 async def sarsa_endpoint(params: SarsaParams, db: Session = Depends(get_db)):
-    """Endpoint principal pour l'entraînement SARSA"""
+    """Main endpoint for SARSA training"""
     return run_sarsa(params, db)
 
-# Initialiser la base de données au démarrage
+# Initialize database on startup
 @app.on_event("startup")
 async def startup_event():
-    """Événement de démarrage de l'application"""
+    """Application startup event"""
     try:
         init_db()
-        print("✅ Base de données initialisée avec succès")
+        print("✅ Database initialized successfully")
     except Exception as e:
-        print(f"❌ Erreur lors de l'initialisation de la base de données: {e}")
+        print(f"❌ Error initializing database: {e}")
 
 if __name__ == "__main__":
     import uvicorn

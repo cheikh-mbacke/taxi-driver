@@ -216,24 +216,12 @@ const RunsTable: React.FC<RunsTableProps> = ({ onRefresh }) => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <TrendingUp
-                            sx={{
-                              fontSize: 16,
-                              mr: 0.5,
-                              color: "success.main",
-                            }}
-                          />
-                          {formatPercentage(run.success_rate)}
-                        </Box>
+                        {run.success_rate
+                          ? formatPercentage(run.success_rate)
+                          : "N/A"}
                       </TableCell>
                       <TableCell>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <Speed
-                            sx={{ fontSize: 16, mr: 0.5, color: "info.main" }}
-                          />
-                          {run.avg_steps?.toFixed(1) || "N/A"}
-                        </Box>
+                        {run.avg_steps ? run.avg_steps.toFixed(1) : "N/A"}
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -299,7 +287,12 @@ const RunsTable: React.FC<RunsTableProps> = ({ onRefresh }) => {
             </Typography>
           </Box>
           <IconButton
-            onClick={() => setDialogOpen(false)}
+            onClick={() => {
+              if (selectedRun) {
+                handleDeleteRun(selectedRun.run_id);
+                setDialogOpen(false);
+              }
+            }}
             sx={{ color: "white" }}
           >
             <Delete />

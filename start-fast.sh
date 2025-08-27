@@ -8,11 +8,11 @@ set -e
 echo "⚡ Démarrage ultra-rapide des services..."
 
 # Variables
-COMPOSE_FILE="infrastructure/docker/docker-compose.dev.yml"
+COMPOSE_FILE="infrastructure/docker/docker-compose.yml"
 
 # Vérifier que le fichier existe
 if [ ! -f "$COMPOSE_FILE" ]; then
-    echo "❌ Fichier docker-compose.dev.yml non trouvé!"
+    echo "❌ Fichier docker-compose.yml non trouvé!"
     exit 1
 fi
 

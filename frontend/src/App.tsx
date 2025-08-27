@@ -1,21 +1,23 @@
 import React from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Box } from "@mui/material";
 import Dashboard from "./components/Dashboard";
 
-// Création du thème personnalisé
+/**
+ * Custom Material-UI theme configuration
+ * Defines the color palette, typography, and component styling
+ */
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1976d2",
+      main: "#1976d2", // Blue primary color
     },
     secondary: {
-      main: "#dc004e",
+      main: "#dc004e", // Pink secondary color
     },
     background: {
-      default: "#f5f5f5",
+      default: "#f5f5f5", // Light gray background
     },
   },
   typography: {
@@ -28,6 +30,7 @@ const theme = createTheme({
     },
   },
   components: {
+    // Custom card styling
     MuiCard: {
       styleOverrides: {
         root: {
@@ -36,6 +39,7 @@ const theme = createTheme({
         },
       },
     },
+    // Custom button styling
     MuiButton: {
       styleOverrides: {
         root: {
@@ -48,13 +52,15 @@ const theme = createTheme({
   },
 });
 
+/**
+ * Main App component
+ * Provides theme context and renders the dashboard
+ */
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ minHeight: "100vh", backgroundColor: "background.default" }}>
-        <Dashboard />
-      </Box>
+      <Dashboard />
     </ThemeProvider>
   );
 }

@@ -3,17 +3,12 @@ import {
   Box,
   Container,
   Typography,
-  Grid,
   Card,
   CardContent,
-  Paper,
-  Chip,
   LinearProgress,
   Alert,
 } from "@mui/material";
 import {
-  TrendingUp,
-  Speed,
   Psychology,
   Storage,
   Timeline,
@@ -25,6 +20,10 @@ import TrainingForm from "./TrainingForm";
 import RunsTable from "./RunsTable";
 import StatisticsCards from "./StatisticsCards";
 
+/**
+ * Main Dashboard component
+ * Displays the complete RL training interface with statistics, training form, and runs history
+ */
 const Dashboard: React.FC = () => {
   const [statistics, setStatistics] = useState<StatisticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,35 +34,45 @@ const Dashboard: React.FC = () => {
     loadStatistics();
   }, []);
 
+  /**
+   * Load training statistics from the API
+   */
   const loadStatistics = async () => {
     try {
       setLoading(true);
       const stats = await apiService.getStatistics();
       setStatistics(stats);
     } catch (err) {
-      setError("Erreur lors du chargement des statistiques");
+      setError("Error loading statistics");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Handle training start event
+   */
   const handleTrainingStart = () => {
     setIsTraining(true);
   };
 
+  /**
+   * Handle training completion event
+   */
   const handleTrainingComplete = () => {
     setIsTraining(false);
-    loadStatistics(); // Recharger les stats
+    loadStatistics(); // Reload statistics after training
   };
 
+  // Loading state
   if (loading) {
     return (
       <Container maxWidth="xl">
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 1 }}>
           <LinearProgress />
           <Typography variant="h6" sx={{ mt: 2 }}>
-            Chargement des statistiques...
+            Loading statistics...
           </Typography>
         </Box>
       </Container>
@@ -72,21 +81,20 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container maxWidth="xl">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        {/* Header */}
-        <Box sx={{ mb: 4 }}>
+      <Box sx={{ px: 2, py: 2 }}>
+        {/* Page Header */}
+        <Box sx={{ mb: 2 }}>
           <Typography variant="h3" component="h1" gutterBottom>
             🚕 Taxi Driver RL Dashboard
           </Typography>
           <Typography variant="h6" color="text.secondary">
             Interface d'apprentissage par renforcement pour l'environnement
-            Taxi-v3
           </Typography>
         </Box>
 
-        {/* Error Alert */}
+        {/* Error Display */}
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
@@ -94,9 +102,17 @@ const Dashboard: React.FC = () => {
         {/* Statistics Cards */}
         {statistics && <StatisticsCards statistics={statistics} />}
 
-        {/* Training Section */}
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid item xs={12} md={6}>
+        {/* Training and System Status Section */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 2,
+            mt: 1,
+          }}
+        >
+          {/* Training Form Card */}
+          <Box sx={{ flex: 1 }}>
             <Card>
               <CardContent>
                 <Typography variant="h5" gutterBottom>
@@ -109,39 +125,40 @@ const Dashboard: React.FC = () => {
                 />
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
 
-          <Grid item xs={12} md={6}>
+          {/* System Status Card */}
+          <Box sx={{ flex: 1 }}>
             <Card>
               <CardContent>
                 <Typography variant="h5" gutterBottom>
-                  📊 État du Système
+                  📊 System Status
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <CheckCircle color="success" />
-                    <Typography>API Backend: Connecté</Typography>
+                    <Typography>API Backend: Connected</Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Storage color="primary" />
-                    <Typography>Base de données: PostgreSQL</Typography>
+                    <Typography>Database: PostgreSQL</Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Psychology color="secondary" />
-                    <Typography>Algorithme: SARSA</Typography>
+                    <Typography>Algorithm: SARSA</Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Timeline color="info" />
-                    <Typography>Environnement: Taxi-v3</Typography>
+                    <Typography>Environment: Taxi-v3</Typography>
                   </Box>
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
-        {/* Runs Table */}
-        <Box sx={{ mt: 4 }}>
+        {/* Training Runs History */}
+        <Box sx={{ mt: 2 }}>
           <RunsTable onRefresh={loadStatistics} />
         </Box>
       </Box>

@@ -33,7 +33,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ statistics }) => {
   const totalExecutionTime = statistics?.total_execution_time ?? 0;
 
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={2}>
       {/* Total Runs */}
       <Grid item xs={12} sm={6} md={3}>
         <Card
