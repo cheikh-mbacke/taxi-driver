@@ -68,6 +68,10 @@ class BruteForceAgent(BaseAgent):
         """Action aléatoire"""
         return self.env.action_space.sample()
     
+    def choose_action(self, state: int) -> int:
+        """Alias pour get_action pour compatibilité"""
+        return self.get_action(state)
+    
     def update(self, state: int, action: int, reward: float, 
                next_state: int, **kwargs) -> float:
         """Pas de mise à jour pour l'agent brute force"""

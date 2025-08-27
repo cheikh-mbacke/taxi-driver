@@ -1,9 +1,19 @@
-from app.schemas.common import CommonParams
+from app.api.schemas.common import CommonParams
 from typing import Optional
-from pydantic import Field
+from pydantic import Field, ConfigDict
 
 class SarsaParams(CommonParams):
     """Paramètres spécifiques à l'algorithme SARSA"""
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "mode": "optimized",
+                "test_episodes": 250,
+                "training_runs": 6000
+            }
+        }
+    )
     
     # Paramètres spécifiques à SARSA
     mode: Optional[str] = Field(
@@ -32,13 +42,3 @@ class SarsaParams(CommonParams):
             self.test_episodes = 250    # VALIDATION ROBUSTE (vs 100 précédent)
         
         return self
-    
-    class Config:
-        # Exemple de paramètres pour la documentation API
-        schema_extra = {
-            "example": {
-                "mode": "optimized",
-                "test_episodes": 250,
-                "training_runs": 6000
-            }
-        }
